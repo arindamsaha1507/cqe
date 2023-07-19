@@ -89,6 +89,17 @@ ci_class = {
 }
 
 
+grade_limits_compliant = {
+    "A": (3.5, 4.0),
+    "B": (3.0, 4.0),
+    "C": (3.5, 3.0),
+    "D": (3.0, 3.0),
+    "RU-1": (0.0, 0.0),
+}
+
+grade_limits_not_compliant = {"RU-2": (3.0, 4.0), "RU-3": (3.5, 0.0), "U": (0.0, 0.0)}
+
+
 def validate_parameters():
     """Helper function to validate if keys are proper."""
 

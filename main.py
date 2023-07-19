@@ -28,6 +28,7 @@ def main():
     print(compost.check_compliance())
     print(compost.get_fertility_index())
     print(compost.get_clean_index())
+    print(compost.get_grade())
 
 
 if __name__ == "__main__":

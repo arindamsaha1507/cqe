@@ -107,3 +107,20 @@ class Compost:
         )
 
         return num / den
+
+    def get_grade(self) -> str:
+        """Method to get compost grade."""
+
+        if self.check_compliance():
+            limits = parameters.grade_limits_compliant
+        else:
+            limits = parameters.grade_limits_not_compliant
+
+        fertility_index = self.get_fertility_index()
+        clean_index = self.get_clean_index()
+
+        for grade, (fi_limit, ci_limit) in limits.items():
+            if fertility_index > fi_limit and clean_index > ci_limit:
+                return grade
+
+        raise ValueError("Compost grade not found.")
