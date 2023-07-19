@@ -96,7 +96,7 @@ class Scores:
 
 
 @dataclass
-class BasicProperty:
+class PropertyBase:
     """Class to handle basic compost properties."""
 
     identity: Identity
@@ -117,46 +117,31 @@ class BasicProperty:
 
 
 @dataclass
-class FertilityProperty:
+class BasicProperty(PropertyBase):
+    """Class to handle basic compost properties."""
+
+
+@dataclass
+class FertilityProperty(PropertyBase):
     """Class to handle fertility compost properties."""
 
-    identity: Identity
-    valid_range: Limits
-    compliance_range: Limits
     fertility: Scores
-
-    @property
-    def compliance(self) -> bool:
-        """Property to check if a value is within a specified range."""
-
-        value = self.identity.value
-        return self.compliance_range.is_compliant(value)
 
     def __post_init__(self):
         """Post init method to handle derived properties."""
 
-        self.valid_range.validate(self.identity)
+        super().__post_init__()
         self.fertility.assign_category(self.identity.value)
 
 
 @dataclass
-class CleanProperty:
+class CleanProperty(PropertyBase):
     """Class to handle clean compost properties."""
 
-    identity: Identity
-    valid_range: Limits
-    compliance_range: Limits
     clean: Scores
-
-    @property
-    def compliance(self) -> bool:
-        """Property to check if a value is within a specified range."""
-
-        value = self.identity.value
-        return self.compliance_range.is_compliant(value)
 
     def __post_init__(self):
         """Post init method to handle derived properties."""
 
-        self.valid_range.validate(self.identity)
+        super().__post_init__()
         self.clean.assign_category(self.identity.value, clean=True)
