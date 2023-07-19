@@ -1,6 +1,6 @@
 """Module for running the compost class."""
 
-from compost import Compost
+from cqe import Compost
 
 
 def main():

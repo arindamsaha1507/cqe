@@ -3,9 +3,9 @@
 
 from enum import Enum
 
-import parameters
+from cqe import parameters
 
-from properties import (
+from cqe.properties import (
     BasicProperty,
     FertilityProperty,
     CleanProperty,
