@@ -2,3 +2,4 @@
 
 
 from .compost import Compost
+from .parameters import *
