@@ -83,23 +83,27 @@ class Compost:
     def get_fertility_index(self) -> float:
         """Method to compute fertility index."""
 
-        num = 0.0
-        den = 0.0
+        num = sum(
+            prop.fertility.category * prop.fertility.weight
+            for prop in self.properties[PropertyType.FERTILITY].values()
+        )
 
-        for prop in self.properties[PropertyType.FERTILITY].values():
-            num += prop.fertility.category * prop.fertility.weight
-            den += prop.fertility.weight
+        den = sum(
+            prop.fertility.weight
+            for prop in self.properties[PropertyType.FERTILITY].values()
+        )
 
         return num / den
 
     def get_clean_index(self) -> float:
         """Method to compute fertility index."""
 
-        num = 0.0
-        den = 0.0
-
-        for prop in self.properties[PropertyType.CLEAN].values():
-            num += prop.clean.category * prop.clean.weight
-            den += prop.clean.weight
+        num = sum(
+            prop.clean.category * prop.clean.weight
+            for prop in self.properties[PropertyType.CLEAN].values()
+        )
+        den = sum(
+            prop.clean.weight for prop in self.properties[PropertyType.CLEAN].values()
+        )
 
         return num / den
