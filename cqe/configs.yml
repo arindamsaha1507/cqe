@@ -1,0 +1,76 @@
+moisture:
+  compliance_limit: [15, 25]
+
+ph:
+  compliance_limit: [6.5, 7.5]
+
+conductivity:
+  compliance_limit: [0, 4]
+
+bulk_density:
+  compliance_limit: [0, 1]
+
+organic_matter:
+  compliance_limit: [12, 100]
+  weight: 5
+  category_limits: [20, 15, 12, 9]
+
+nitrogen:
+  compliance_limit: [0.8, 100]
+  weight: 3
+  category_limits: [1.25, 1.0, 0.8, 0.5]
+
+phosphorus:
+  compliance_limit: [0.175, 100]
+  weight: 3
+  category_limits: [0.6, 0.4, 0.2, 0.1]
+
+potassium:
+  compliance_limit: [0.33, 100]
+  weight: 1
+  category_limits: [1.0, 0.75, 0.5, 0.25]
+
+cn_ratio:
+  compliance_limit: [0, 20]
+  weight: 3
+  category_limits: [10, 15, 20, 25]
+
+zinc:
+  compliance_limit: [0, 1000]
+  weight: 1
+  category_limits: [150, 300, 500, 700, 900]
+
+copper:
+  compliance_limit: [0, 300]
+  weight: 2
+  category_limits: [50, 100, 200, 400, 600]
+
+cadmium:
+  compliance_limit: [0, 5]
+  weight: 5
+  category_limits: [0.3, 0.6, 1.0, 2.0, 4.0]
+
+lead:
+  compliance_limit: [0, 100]
+  weight: 3
+  category_limits: [50, 100, 150, 250, 400]
+
+chromium:
+  compliance_limit: [0, 50]
+  weight: 3
+  category_limits: [50, 100, 150, 250, 350]
+
+nickel:
+  compliance_limit: [0, 50]
+  weight: 1
+  category_limits: [20, 40, 80, 120, 160]
+
+arsenic:
+  compliance_limit: [0, 10]
+  weight: 4
+  category_limits: [3.0, 5.0, 10.0, 15.0, 30.0]
+
+mercury:
+  compliance_limit: [0, 0.15]
+  weight: 5
+  category_limits: [0.05, 0.15, 1.0, 5.0, 10.0]

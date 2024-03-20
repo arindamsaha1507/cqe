@@ -73,13 +73,13 @@ class CompostProperties:
     ph: Property
     conductivity: Property
     bulk_density: Property
-    organic_matter: Property
 
 
 @dataclass
 class CompostNutritionalProperties:
     """Class for the nutritional properties of the compost."""
 
+    organic_matter: NutritionalProperty
     nitrogen: NutritionalProperty
     phosphorus: NutritionalProperty
     potassium: NutritionalProperty
