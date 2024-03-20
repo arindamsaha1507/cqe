@@ -1,35 +1,28 @@
 """Module for running the compost class."""
 
-from cqe import Compost
+from dataclasses import dataclass, field
 
 
-def main():
-    """Main function."""
+@dataclass
+class Limit:
+    """Utility class for setting limits."""
 
-    inputs = {
-        "Moisture Content": 1,
-        "pH": 2,
-        "Electrical Conductivity": 3.0,
-        "Bulk Density": 4,
-        "Carbon": 5,
-        "Nitrogen": 6,
-        "Phosphorous": 7.0,
-        "Potassium": 8.0,
-        "Zinc": 9.0,
-        "Copper": 10.0,
-        "Cadmium": 11.0,
-        "Lead": 12.0,
-        "Chromium": 13.0,
-        "Nickel": 14.0,
-    }
+    min: float = field(default=0.0)
+    max: float = field(default=float("inf"))
 
-    compost = Compost(inputs)
-
-    print(compost.check_compliance())
-    print(compost.get_fertility_index())
-    print(compost.get_clean_index())
-    print(compost.get_grade())
+    def __post_init__(self):
+        if self.min > self.max:
+            raise ValueError(
+                f"Minimum value ({self.min}) must be less than maximum value ({self.max})."
+            )
 
 
-if __name__ == "__main__":
-    main()
+@dataclass
+class Property:
+    """Class for a property of the compost."""
+
+    name: str
+    value: str
+
+    theoretical_limit: Limit
+    compliance_limit: Limit
