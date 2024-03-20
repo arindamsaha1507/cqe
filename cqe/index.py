@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 
 from cqe.globs import CategoryType, IndexType, MAX_SCORE
 
+
 @dataclass
 class Index:
     """Class for an index of the compost."""
@@ -37,5 +38,3 @@ class Index:
             for limit in self.category_limits:
                 if value < limit:
                     self.score -= 1
-
-
