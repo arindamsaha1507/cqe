@@ -1,6 +1,7 @@
 """Module for running the compost class."""
 
 from dataclasses import dataclass, field
+from typing import Callable
 import yaml
 
 from cqe.globs import IndexType
@@ -119,7 +120,7 @@ class Properties:
         strings = self.show_all_properties().split("\n")
         strings.insert(0, header)
 
-        return "\n"+"\n".join(strings)
+        return "\n" + "\n".join(strings)
 
 
 @dataclass
@@ -134,6 +135,7 @@ class CompostProperties(Properties):
     def __repr__(self) -> str:
         return self.show_all_properties_with_header("Compost Properties")
 
+
 @dataclass
 class CompostNutritionalProperties(Properties):
     """Class for the nutritional properties of the compost."""
@@ -146,9 +148,12 @@ class CompostNutritionalProperties(Properties):
     def __repr__(self) -> str:
         return self.show_all_properties_with_header("Compost Nutritional Properties")
 
+
 @dataclass
 class CompostHeavyMetalProperties(Properties):
     """Class for the heavy metal properties of the compost."""
+
+    # pylint: disable=too-many-instance-attributes
 
     zinc: HeavyMetalProperty
     copper: HeavyMetalProperty
@@ -162,6 +167,7 @@ class CompostHeavyMetalProperties(Properties):
     def __repr__(self) -> str:
         return self.show_all_properties_with_header("Compost Heavy Metal Properties")
 
+
 @dataclass
 class CompostDerivedProperties(Properties):
     """Class for the derived properties of the compost."""
@@ -171,6 +177,7 @@ class CompostDerivedProperties(Properties):
 
     def __repr__(self) -> str:
         return self.show_all_properties_with_header("Compost Derived Properties")
+
 
 @dataclass
 class Compost:
@@ -193,14 +200,30 @@ class CompostFactory:
             return yaml.safe_load(file)
 
     @staticmethod
+    def create_limit_from_config(config: dict, name: str) -> Limit:
+        """Create a limit object from a yaml dictionary."""
+
+        return Limit(
+            config[name]["compliance_limit"][0],
+            config[name]["compliance_limit"][1],
+        )
+
+    @staticmethod
+    def create_index(name: str, typ: IndexType, config: dict) -> Index:
+        """Create an index object from a yaml dictionary."""
+
+        return Index(
+            typ=typ,
+            weight=config[name]["weight"],
+            category_limits=config[name]["category_limits"],
+        )
+
+    @staticmethod
     def create_property(name: str, config: dict, inputs: dict) -> Property:
         """Create a property object from a yaml dictionary."""
 
         value = inputs[name]
-        compliance_limit = Limit(
-            config[name]["compliance_limit"][0],
-            config[name]["compliance_limit"][1],
-        )
+        compliance_limit = CompostFactory.create_limit_from_config(config, name)
 
         return Property(name, value, Limit(), compliance_limit, True, True)
 
@@ -211,10 +234,7 @@ class CompostFactory:
         """Create a nutritional property object from a yaml dictionary."""
 
         value = inputs[name]
-        compliance_limit = Limit(
-            config[name]["compliance_limit"][0],
-            config[name]["compliance_limit"][1],
-        )
+        compliance_limit = CompostFactory.create_limit_from_config(config, name)
 
         return NutritionalProperty(
             name,
@@ -223,11 +243,7 @@ class CompostFactory:
             compliance_limit,
             True,
             True,
-            Index(
-                typ=IndexType.FERTILITY,
-                weight=config[name]["weight"],
-                category_limits=config[name]["category_limits"],
-            ),
+            CompostFactory.create_index(name, IndexType.FERTILITY, config),
         )
 
     @staticmethod
@@ -237,10 +253,7 @@ class CompostFactory:
         """Create a heavy metal property object from a yaml dictionary."""
 
         value = inputs[name]
-        compliance_limit = Limit(
-            config[name]["compliance_limit"][0],
-            config[name]["compliance_limit"][1],
-        )
+        compliance_limit = CompostFactory.create_limit_from_config(config, name)
 
         return HeavyMetalProperty(
             name,
@@ -249,47 +262,54 @@ class CompostFactory:
             compliance_limit,
             True,
             True,
-            Index(
-                typ=IndexType.CLEAN,
-                weight=config[name]["weight"],
-                category_limits=config[name]["category_limits"],
-            ),
+            CompostFactory.create_index(name, IndexType.CLEAN, config),
         )
+
+    @staticmethod
+    def npk_calculator(inputs: dict) -> float:
+        """Calculate the npk ratio of the compost."""
+
+        nitrogen = inputs["nitrogen"]
+        phosphorus = inputs["phosphorus"]
+        potassium = inputs["potassium"]
+
+        return nitrogen + 2.29 * phosphorus + 1.21 * potassium
+
+    @staticmethod
+    def cn_calculator(inputs: dict) -> float:
+        """Calculate the cn ratio of the compost."""
+
+        organic_matter = inputs["organic_matter"]
+        nitrogen = inputs["nitrogen"]
+
+        return organic_matter / nitrogen
+
+    @staticmethod
+    def function_mapper() -> dict[str, (Callable, Callable)]:
+        """Map the derived property name to the function that calculates it."""
+
+        return {
+            "cn_ratio": (
+                CompostFactory.cn_calculator,
+                CompostFactory.create_nutritional_property,
+            ),
+            "npk": (
+                CompostFactory.npk_calculator,
+                CompostFactory.create_property,
+            ),
+        }
 
     @staticmethod
     def create_derived_property(name: str, config: dict, inputs: dict) -> Property:
         """Create a derived property object from a yaml dictionary."""
 
-        compliance_limit = Limit(
-            config[name]["compliance_limit"][0],
-            config[name]["compliance_limit"][1],
-        )
+        if name not in CompostFactory.function_mapper():
+            raise ValueError(f"Derived property {name} not recognised.")
 
-        if name == "cn_ratio":
-            value = inputs["organic_matter"] / inputs["nitrogen"]
-            return NutritionalProperty(
-                name,
-                value,
-                Limit(),
-                compliance_limit,
-                True,
-                True,
-                Index(
-                    typ=IndexType.FERTILITY,
-                    weight=config[name]["weight"],
-                    category_limits=config[name]["category_limits"],
-                ),
-            )
-
-        if name == "npk":
-            value = (
-                inputs["nitrogen"]
-                + 2.29 * inputs["phosphorus"]
-                + 1.21 * inputs["potassium"]
-            )
-            return Property(name, value, Limit(), compliance_limit, True, True)
-
-        raise ValueError(f"Derived property {name} not recognised.")
+        function_map = CompostFactory.function_mapper()
+        calculator, creator = function_map[name]
+        value = calculator(inputs)
+        return creator(name, config, {name: value})
 
     @staticmethod
     def create_from_yaml(configs: dict, inputs: dict) -> Compost:
