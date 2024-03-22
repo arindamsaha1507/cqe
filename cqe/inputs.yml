@@ -1,0 +1,19 @@
+moisture: 20
+ph: 7
+conductivity: 2
+bulk_density: 0.5
+
+organic_matter: 15
+nitrogen: 10
+phosphorus: 0.2
+potassium: 0.5
+
+
+zinc: 200
+copper: 100
+cadmium: 1
+lead: 100
+chromium: 10
+nickel: 10
+arsenic: 12
+mercury: 0.1
