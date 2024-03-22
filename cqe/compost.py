@@ -100,8 +100,30 @@ class HeavyMetalProperty(Property):
         )
 
 
+class Properties:
+    """Base class for the properties of the compost."""
+
+    def show_all_properties(self) -> str:
+        """Show all the properties of the compost."""
+
+        strings = []
+
+        for prop in self.__dict__.values():
+            strings.append(str(prop))
+
+        return "\n".join(strings)
+
+    def show_all_properties_with_header(self, header: str) -> str:
+        """Show all the properties of the compost with a header."""
+
+        strings = self.show_all_properties().split("\n")
+        strings.insert(0, header)
+
+        return "\n"+"\n".join(strings)
+
+
 @dataclass
-class CompostProperties:
+class CompostProperties(Properties):
     """Class for the properties of the compost."""
 
     moisture: Property
@@ -110,11 +132,10 @@ class CompostProperties:
     bulk_density: Property
 
     def __repr__(self) -> str:
-        return f"\nCompost Properties\n{self.moisture}\n{self.ph}\n{self.conductivity}\n{self.bulk_density}\n"
-
+        return self.show_all_properties_with_header("Compost Properties")
 
 @dataclass
-class CompostNutritionalProperties:
+class CompostNutritionalProperties(Properties):
     """Class for the nutritional properties of the compost."""
 
     organic_matter: NutritionalProperty
@@ -123,11 +144,10 @@ class CompostNutritionalProperties:
     potassium: NutritionalProperty
 
     def __repr__(self) -> str:
-        return f"\nCompost Nutritional Properties\n{self.organic_matter}\n{self.nitrogen}\n{self.phosphorus}\n{self.potassium}\n"
-
+        return self.show_all_properties_with_header("Compost Nutritional Properties")
 
 @dataclass
-class CompostHeavyMetalProperties:
+class CompostHeavyMetalProperties(Properties):
     """Class for the heavy metal properties of the compost."""
 
     zinc: HeavyMetalProperty
@@ -140,19 +160,17 @@ class CompostHeavyMetalProperties:
     mercury: HeavyMetalProperty
 
     def __repr__(self) -> str:
-        return f"\nCompost Heavy Metal Properties\n{self.zinc}\n{self.copper}\n{self.cadmium}\n{self.lead}\n{self.chromium}\n{self.nickel}\n{self.arsenic}\n{self.mercury}\n"
-
+        return self.show_all_properties_with_header("Compost Heavy Metal Properties")
 
 @dataclass
-class CompostDerivedProperties:
+class CompostDerivedProperties(Properties):
     """Class for the derived properties of the compost."""
 
     cn_ratio: NutritionalProperty
     npk_ratio: Property
 
     def __repr__(self) -> str:
-        return f"\nCompost Derived Properties\n{self.cn_ratio}\n{self.npk_ratio}\n"
-
+        return self.show_all_properties_with_header("Compost Derived Properties")
 
 @dataclass
 class Compost:
@@ -326,7 +344,13 @@ class CompostFactory:
         print(heavy_metal_properties)
         print(derived_properties)
 
-        return Compost(properties, nutritional_properties, heavy_metal_properties, derived_properties)
+        return Compost(
+            properties,
+            nutritional_properties,
+            heavy_metal_properties,
+            derived_properties,
+        )
+
 
 if __name__ == "__main__":
 
