@@ -145,6 +145,18 @@ class CompostNutritionalProperties(Properties):
     phosphorus: NutritionalProperty
     potassium: NutritionalProperty
 
+    @property
+    def fertility_index(self) -> float:
+        """Calculate the fertility index of the compost."""
+
+        num = sum(
+            prop.fertilization_index.weight * prop.fertilization_index.score
+            for prop in self.__dict__.values()
+        )
+        den = sum(prop.fertilization_index.weight for prop in self.__dict__.values())
+
+        return num / den
+
     def __repr__(self) -> str:
         return self.show_all_properties_with_header("Compost Nutritional Properties")
 
@@ -163,6 +175,18 @@ class CompostHeavyMetalProperties(Properties):
     nickel: HeavyMetalProperty
     arsenic: HeavyMetalProperty
     mercury: HeavyMetalProperty
+
+    @property
+    def clean_index(self) -> float:
+        """Calculate the clean index of the compost."""
+
+        num = sum(
+            prop.clean_index.weight * prop.clean_index.score
+            for prop in self.__dict__.values()
+        )
+        den = sum(prop.clean_index.weight for prop in self.__dict__.values())
+
+        return num / den
 
     def __repr__(self) -> str:
         return self.show_all_properties_with_header("Compost Heavy Metal Properties")
@@ -187,6 +211,19 @@ class Compost:
     nutritional_properties: CompostNutritionalProperties
     heavy_metal_properties: CompostHeavyMetalProperties
     derived_properties: CompostDerivedProperties
+
+    @property
+    def is_compliant(self) -> bool:
+        """Check if the compost is compliant with all the limits."""
+
+        all_properties = (
+            *vars(self.properties).values(),
+            *vars(self.nutritional_properties).values(),
+            *vars(self.heavy_metal_properties).values(),
+            *vars(self.derived_properties).values(),
+        )
+
+        return all(prop.is_compliant for prop in all_properties if prop.use_compliance)
 
 
 class CompostFactory:
@@ -385,4 +422,8 @@ if __name__ == "__main__":
     con = CompostFactory.read_yaml("cqe/configs.yml")
     inp = CompostFactory.read_yaml("cqe/inputs.yml")
 
-    CompostFactory.create_from_yaml(con, inp)
+    compost = CompostFactory.create_from_yaml(con, inp)
+
+    print(compost.nutritional_properties.fertility_index)
+    print(compost.heavy_metal_properties.clean_index)
+    print(compost.is_compliant)
